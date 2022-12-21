@@ -1,0 +1,41 @@
+{% extends 'base/authbase.html' %}
+
+
+{% block TITLE %}
+{{ title }}
+{% endblock TITLE %}
+
+{% block content %}
+<div class="authcontent">
+    <form action="{% url 'register' %}" method="post">
+    {% csrf_token %}
+        <div class="mb-3">
+            <label for="exampleInputEmail1" class="form-label">Email address</label>
+            {{ form.email }}
+            <div id="emailHelp" class="form-text">We'll never share your email anyone else.</div>
+        </div>
+
+        <div class="mb-3">
+            <label for="exampleInputPhone1" class="form-label">Phone</label>
+            {{ form.phone }}
+        </div>
+        
+        <div class="mb-3">
+            <label for="exampleInputPassword1" class="form-label">Password</label>
+            {{ form.password }}
+        </div>
+        {% if user.is_active == False %}
+
+        
+        {% endif %}
+        <button type="submit" class="btn btn-primary" id = "loginhelp">Register</button>
+        {% comment %} {% include 'parts/forms/simple_form.html' with form=form %}
+        <input class="btn btn-primary mt-3" type="submit"
+               value="Registration"> {% endcomment %}
+        <div id="loginhelp" class="form-text">Do you have an account?<a href="{% url 'login' %}"> Login</a></div>
+        {% if error %}
+            <div class="error"><li class="text-danger small" style="font-size:15px;">{{ error }}</li></div>
+        {% endif %}
+    </form>
+</div>  
+{% endblock content %}

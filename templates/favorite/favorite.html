@@ -1,0 +1,75 @@
+
+{% extends 'base/authbase.html' %}
+
+{% block TITLE %}
+{{ title }}
+{% endblock TITLE %}
+
+
+{% block content %}
+<section>
+    <div class="container">
+        <div class="row">
+            <div class="col-12 col-lg-6 offset-lg-3">
+                {% if order.items.exists %}
+                    <table class="table">
+                        <thead>
+                        <tr>
+                            <th scope="col">#</th>
+                            <th scope="col">Product</th>
+                            <th scope="col">Price</th>
+                            <th scope="col">Delete</th>
+                            <th scope="col"></th>
+                        </tr>
+                        </thead>
+                        <tbody method="post" action="{% url 'recalculate_favorite' %}" id="recalculateFavorite">
+                            {% csrf_token %}
+                            {% for product_relation in products_relation.iterator %}
+                            <tr>
+                                <th scope="row">{{ forloop.counter }}</th>
+                                <td>{{ product_relation.item.name }}</td>
+
+                                <td>{% widthratio product_relation.full_price 1 product_relation.item.curs %}</td>
+                                <td>                                    
+                                    <input type="hidden" 
+                                            value="{{ product_relation.item.id  }}" 
+                                            name="product"
+                                        >
+                                    <input type="submit" 
+                                            class="btn btn-danger" 
+                                            value="X" 
+                                            formaction="{% url 'update_favorite' 'remove' %}"
+                                        >
+                                </td>
+                                <td></td>
+                            </tr>
+                        {% endfor %}
+                            <tr>
+                                <td>
+
+                                </td>
+                                <td>
+                                    <input class="btn btn-secondary"
+                                        type="submit"
+                                        value="Clear"
+                                        formaction="{% url 'update_favorite' 'clear' %}"
+                                    >
+                                </td>
+                                <td></td>
+                                <td></td>
+                                <td></td> 
+                                <td></td>
+                            </tr>
+                        </form>
+                        </tbody>
+                    </table>
+                {% else %}
+                    <h3>Your favorits is empty.</h3>
+                    <p>Goto <a href="{% url 'main' %}">products</a>
+                        page and add something good to favorits.</p>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</section>
+{% endblock content %}

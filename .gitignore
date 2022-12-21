@@ -1,0 +1,9 @@
+django_db.models.
+django_db
+text.text
+.ideal_text_pycache_
+__pycache__
+.idea
+images/
+.img
+.png

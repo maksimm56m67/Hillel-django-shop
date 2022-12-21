@@ -1,0 +1,38 @@
+
+{% extends 'base/authbase.html' %}
+
+{% block TITLE %}
+{{ title }}
+{% endblock TITLE %}
+
+
+{% block content %}
+<section class="feedback">
+    <div class="container">
+        <div class="row">
+            <div class="col col-lg-4 offset-lg-4 mb-3">
+                <h2>Leave you feedback</h2>
+                <form method="post" action="{% url 'feedbacks' %}">
+                    {% include 'parts/forms/simple_form.html' with form=form %}
+                    <input class="btn btn-primary mt-3" type="submit"
+                           value="Submit">
+                </form>
+            </div>
+            <div class="d-none d-lg-block col-lg-4"></div>
+            {% for feedback in Feedbacks %}
+                <div class="col-12 col-lg-4">
+                    <div class="card" style="margin: 10px;">
+                        <div class="card-body">
+                            <span class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger">
+                            {{ feedback.rating }}
+                            <span class="visually-hidden">unread messages</span>
+                          </span>
+                            {{ feedback.text }}
+                        </div>
+                    </div>
+                </div>
+            {% endfor %}
+        </div>
+    </div>
+</section>
+{% endblock content %}

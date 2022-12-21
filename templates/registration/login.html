@@ -1,0 +1,22 @@
+{% extends 'base/authbase.html' %}
+
+
+{% block TITLE %}
+{{ title }}
+{% endblock TITLE %}
+
+{% block content %} 
+<div class="authcontent">
+    <form method="post">
+        {% include 'parts/forms/simple_form.html' with form=form %}
+         <input class="btn btn-primary mt-3" type="submit" value="Login">
+
+            <div id="loginhelp" class="form-text">don't you have an account?<a href="{% url 'register' %}"> Registeration</a></div>
+            {% if error %}
+                <div class="error"><li class="text-danger small" style="font-size:15px;">{{ error }}</li></div>
+            {% endif %}  
+                         
+    </form>
+
+</div>  
+{% endblock content %}

@@ -1,0 +1,23 @@
+{% extends 'base/authbase.html' %}
+
+
+{% block TITLE %}
+{{ title }}
+{% endblock TITLE %}
+
+{% block content %}
+<div class="authcontent">
+    <form action="{% url 'confirm_registration' %}" method="post">
+    {% csrf_token %}
+
+        <div class="mb-3">
+            <label for="exampleInputPassword1" class="form-label">Check-Phone</label>
+            {{ confirm_form.checkphone }}
+        <div id="emailHelp" class="form-text">Write the numbers that came to your phone.</div>
+        <button type="submit" class="btn btn-primary" id = "loginhelp">Confirm register</button>
+        {% if error %}
+            <div class="error"><li class="text-danger small" style="font-size:15px;">{{ error }}</li></div>
+        {% endif %}
+    </form>
+</div>  
+{% endblock content %}
