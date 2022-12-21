@@ -38,11 +38,11 @@ class ProductsView(ListView):
     filter_form = ProductFilterForm
 
     def filtered_queryset(self, queryset):
-        category_id = self.request.GET.get('category_name')
+        category_id = self.request.GET.get('category')
         currency = self.request.GET.get('currency')
         name = self.request.GET.get('name')
         if category_id:
-            queryset = queryset.filter(category_name=category_id)
+            queryset = queryset.filter(category_id=category_id)
         if currency:
             queryset = queryset.filter(currency=currency)
         if name:
