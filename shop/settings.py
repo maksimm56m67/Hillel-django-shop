@@ -69,6 +69,8 @@ INSTALLED_APPS = [
     
     'rest_framework',
     'widget_tweaks',
+    
+    'django_filters',
 ]
 CRISPY_TEMPLATE_PACK = 'uni_form'
 

@@ -66,12 +66,14 @@ def registration(request):
 
         password = make_password(form.data['password'])
 
+
         user = User.objects.create(
             email=form.data['email'],
             phone=form.data['phone'],
             password=password,
             is_active=False
         )  
+        context['usersession'] = request.session['user'] = user.email
         code = random.randint(10000, 99999)
         
         messages.success(request, f'User created successfully')
@@ -103,8 +105,10 @@ def confirm_registration(request):
         if code != check_form.data['checkphone']:
             messages.success(request, f'Phone was confirmed')
             context['error'] = f'Phone was confirmed'
-            # user.is_active = True
-            # user.save()
+            user = request.session.get('user', 'mini')
+            userr = User.objects.filter(user=user)
+            userr.is_active = True
+            userr.save()
             return render(request, 'registration/registration.html', context)  
         else:       
             messages.error(request, f'To confirm the user write the numbers that came to your phone. {code}')

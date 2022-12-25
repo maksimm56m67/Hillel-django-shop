@@ -57,3 +57,5 @@ class ProductFilterForm(forms.Form):
         choices=[('', 'Select')] + Currency.choices,
     )
     name = forms.CharField(max_length=255, required=False)
+    
+    

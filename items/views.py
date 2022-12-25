@@ -20,6 +20,8 @@ from django.views.generic import TemplateView
 from django.core.paginator import Paginator
 from django.contrib import messages
 from items.tasks import send_contact_form
+from items.filters import ProductFilter
+from django_filters.views import FilterView
 
 
 def products(request, *args, **kwargs):
@@ -31,27 +33,57 @@ def products(request, *args, **kwargs):
     }
     return render(request, context=context, template_name='items/mane.html')
 
-class ProductsView(ListView):
+# class ProductsView(FilterView):
+#     template_name = 'items/mane.html'
+#     model = Item
+#     paginate_by = 5
+#     filter_form = ProductFilterForm
+#     filterset_class = ProductFilter
+#     template_name_suffix = 'mane'    
+
+
+    
+#     def filtered_queryset(self, queryset):
+#         category_id = self.request.GET.get('category')
+#         currency = self.request.GET.get('currency')
+#         name = self.request.GET.get('name')
+#         if category_id:
+#             queryset = queryset.filter(category_id=category_id)
+#         if currency:
+#             queryset = queryset.filter(currency=currency)
+#         if name:
+#             queryset = queryset.filter(name__icontains=name)
+#         return queryset
+    
+#     def get_queryset(self):
+#         qs = self.model.get_products()
+#         qs = self.filtered_queryset(qs)
+#         if self.request.user.is_authenticated:
+#             sq = FavoriteProduct.objects.filter(
+#                 product=OuterRef('id'),
+#                 user=self.request.user
+#             )
+#             qs = qs \
+#                 .prefetch_related('in_favorites') \
+#                 .annotate(is_favorite=Exists(sq))
+#         return qs
+
+
+#     def get_context_data(self, *, object_list=None, **kwargs):
+#         context = super().get_context_data(object_list=None, **kwargs)
+#         context.update(
+#             {'filter_form': self.filter_form}
+#         )
+#         return context
+class ProductsView(FilterView):
     template_name = 'items/mane.html'
     model = Item
     paginate_by = 5
-    filter_form = ProductFilterForm
+    filterset_class = ProductFilter
+    template_name_suffix = 'mane'
 
-    def filtered_queryset(self, queryset):
-        category_id = self.request.GET.get('category')
-        currency = self.request.GET.get('currency')
-        name = self.request.GET.get('name')
-        if category_id:
-            queryset = queryset.filter(category_id=category_id)
-        if currency:
-            queryset = queryset.filter(currency=currency)
-        if name:
-            queryset = queryset.filter(name__icontains=name)
-        return queryset
-    
     def get_queryset(self):
         qs = self.model.get_products()
-        qs = self.filtered_queryset(qs)
         if self.request.user.is_authenticated:
             sq = FavoriteProduct.objects.filter(
                 product=OuterRef('id'),
@@ -60,15 +92,7 @@ class ProductsView(ListView):
             qs = qs \
                 .prefetch_related('in_favorites') \
                 .annotate(is_favorite=Exists(sq))
-        return qs
-
-    def get_context_data(self, *, object_list=None, **kwargs):
-        context = super().get_context_data(object_list=None, **kwargs)
-        context.update(
-            {'filter_form': self.filter_form}
-        )
-        return context
-    
+        return qs   
 
 class ProductDetailView(DetailView):
     template_name = 'items/mane.html'
