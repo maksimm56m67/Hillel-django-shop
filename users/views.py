@@ -73,7 +73,7 @@ def registration(request):
             password=password,
             is_active=False
         )  
-        context['usersession'] = request.session['user'] = user.email
+        context['usersession'] = request.session['user'] = user.id
         code = random.randint(10000, 99999)
         
         messages.success(request, f'User created successfully')
@@ -106,7 +106,7 @@ def confirm_registration(request):
             messages.success(request, f'Phone was confirmed')
             context['error'] = f'Phone was confirmed'
             user = request.session.get('user', 'mini')
-            userr = User.objects.filter(user=user)
+            userr = User.objects.filter(id=user)
             userr.is_active = True
             userr.save()
             return render(request, 'registration/registration.html', context)  
