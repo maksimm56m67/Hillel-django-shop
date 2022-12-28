@@ -106,7 +106,7 @@ def confirm_registration(request):
             messages.success(request, f'Phone was confirmed')
             context['error'] = f'Phone was confirmed'
             user = request.session.get('user', 'mini')
-            userr = User.objects.filter(id=user)
+            userr = User.objects.get(id=user)
             userr.is_active = True
             userr.save()
             return render(request, 'registration/registration.html', context)  
