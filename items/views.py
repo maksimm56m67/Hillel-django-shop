@@ -2,7 +2,7 @@ import csv
 
 from django.contrib import messages
 from django.contrib.auth.decorators import login_required, user_passes_test
-from django.http import HttpResponse, HttpResponseRedirect
+from django.http import HttpResponse, HttpResponseRedirect, JsonResponse
 from django.urls import reverse_lazy
 from django.utils.decorators import method_decorator
 from django.views.generic import FormView
@@ -22,6 +22,7 @@ from django.contrib import messages
 from items.tasks import send_contact_form
 from items.filters import ProductFilter
 from django_filters.views import FilterView
+from shop.decorators import ajax_required
 
 
 def products(request, *args, **kwargs):
@@ -33,28 +34,57 @@ def products(request, *args, **kwargs):
     }
     return render(request, context=context, template_name='items/mane.html')
 
+
+class ProductsView(FilterView):
+    template_name = 'items/mane.html'
+    model = Item
+    paginate_by = 5
+    # filter_form = ProductFilterForm
+    filterset_class = ProductFilter
+    # template_name_suffix = 'mane'    
+
+
+    
+    def filtered_queryset(self, queryset):
+        category_id = self.request.GET.get('category')
+        currency = self.request.GET.get('currency')
+        name = self.request.GET.get('name')
+        if category_id:
+            queryset = queryset.filter(category_id=category_id)
+        if currency:
+            queryset = queryset.filter(currency=currency)
+        if name:
+            queryset = queryset.filter(name__icontains=name)
+        return queryset
+    
+    def get_queryset(self):
+        qs = self.model.get_products()
+        qs = self.filtered_queryset(qs)
+        if self.request.user.is_authenticated:
+            sq = FavoriteProduct.objects.filter(
+                items=OuterRef('id'),
+                user=self.request.user
+            )
+            qs = qs \
+                .prefetch_related('in_favorites') \
+                .annotate(is_favorite=Exists(sq))
+        return qs
+
+
+    # def get_context_data(self, *, object_list=None, **kwargs):
+    #     context = super().get_context_data(object_list=None, **kwargs)
+    #     context.update(
+    #         {'filter_form': self.filter_form}
+    #     )
+    #     return context
+
 # class ProductsView(FilterView):
 #     template_name = 'items/mane.html'
 #     model = Item
 #     paginate_by = 5
-#     filter_form = ProductFilterForm
 #     filterset_class = ProductFilter
-#     template_name_suffix = 'mane'    
+#     template_name_suffix = 'mane'
 
-
-    
-#     def filtered_queryset(self, queryset):
-#         category_id = self.request.GET.get('category')
-#         currency = self.request.GET.get('currency')
-#         name = self.request.GET.get('name')
-#         if category_id:
-#             queryset = queryset.filter(category_id=category_id)
-#         if currency:
-#             queryset = queryset.filter(currency=currency)
-#         if name:
-#             queryset = queryset.filter(name__icontains=name)
-#         return queryset
-    
 #     def get_queryset(self):
 #         qs = self.model.get_products()
 #         qs = self.filtered_queryset(qs)
@@ -67,32 +97,14 @@ def products(request, *args, **kwargs):
 #                 .prefetch_related('in_favorites') \
 #                 .annotate(is_favorite=Exists(sq))
 #         return qs
-
-
+    
 #     def get_context_data(self, *, object_list=None, **kwargs):
 #         context = super().get_context_data(object_list=None, **kwargs)
 #         context.update(
-#             {'filter_form': self.filter_form}
-#         )
-#         return context
-class ProductsView(FilterView):
-    template_name = 'items/mane.html'
-    model = Item
-    paginate_by = 5
-    filterset_class = ProductFilter
-    template_name_suffix = 'mane'
+#             {'filter_form': self.filter_form} 
+#         )   
 
-    def get_queryset(self):
-        qs = self.model.get_products()
-        if self.request.user.is_authenticated:
-            sq = FavoriteProduct.objects.filter(
-                product=OuterRef('id'),
-                user=self.request.user
-            )
-            qs = qs \
-                .prefetch_related('in_favorites') \
-                .annotate(is_favorite=Exists(sq))
-        return qs   
+
 
 class ProductDetailView(DetailView):
     template_name = 'items/mane.html'
@@ -176,6 +188,7 @@ def favorites(request):
     return render(request, 'items/favoriteproduct_list.html', context)
 
 
+
 class FavoriteProductAddOrRemoveView(DetailView):
     model = Item
 
@@ -189,4 +202,21 @@ class FavoriteProductAddOrRemoveView(DetailView):
         if not created:
             favorite.delete()
         return HttpResponseRedirect(reverse_lazy('main'))
-    
+
+class AJAXFavoriteProductAddOrRemoveView(DetailView):
+    model = Item
+
+    @method_decorator(ajax_required)
+    def dispatch(self, request, *args, **kwargs):
+        return super().dispatch(request, *args, **kwargs)
+
+    def get(self, request, *args, **kwargs):
+        product = self.get_object()
+        user = request.user
+        favorite, created = FavoriteProduct.objects.get_or_create(
+            items=product,
+            user=user
+        )
+        if not created:
+            favorite.delete()
+        return JsonResponse(data={'created': created})

@@ -8,6 +8,7 @@ urlpatterns = [
     
     path('favorites/', views.favorites, name='favorites'), # http://127.0.0.1:8000/favorites/
     path('favorites/<uuid:pk>/', views.login_required(views.FavoriteProductAddOrRemoveView.as_view()), name='add_or_remove_favorite'), # http://127.0.0.1:8000/favorites/<uuid:pk>/
+    path('ajax-favorites/<uuid:pk>/',views.AJAXFavoriteProductAddOrRemoveView.as_view(), name='ajax_add_or_remove_favorite'),# http://127.0.0.1:8000/ajax-favorites/<uuid:pk>/
     
     path('about/', views.AboutView.as_view(), name='about'), # http://127.0.0.1:8000/about/
     path('csv/', views.export_csv, name='export_csv'),  # http://127.0.0.1:8000/csv/

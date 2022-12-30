@@ -14,7 +14,10 @@
                 <button class="btn btn-primary" type="submit">Filter</button>
             </form>
         </div>
-        {% for product in object_list  %}
+
+
+
+        {% for product in object_list %}
             <div class="col">
                 {% if product.image%}
                     <img src="{{ product.image.url }}" class="product-image p-3" alt="{{ product.name }}" height = "150px" width="160px">
@@ -30,7 +33,8 @@
                     {% endfor %}
                 {% endif %}
                 <p>UAH: {% widthratio product.curs 1 product.price %}</p>
-                {% include 'parts/forms/add_to_cart.html' with item_id=product.id %}
+
+                 {% include 'parts/forms/add_to_cart.html' with item_id=product.id %}  
 
                 <a href="{% url 'add_or_remove_favorite' product.id %}">
                     {% if not product.is_favorite %}
@@ -53,9 +57,11 @@
                     {% endif %}
                 </a>
             </br>
-                {% comment %} {% include 'parts/forms/add_to_favorites.html' with item_id=product.id %}   {% endcomment %}
+                 
             </div>
         {% endfor %}
+
+
         <div style="display: flex; justify-content: center;">
             <div>
                 <nav aria-label="Page navigation example">
@@ -77,6 +83,8 @@
                                 </a>
                             </li>
                         {% endfor %}
+
+
                         {% if page_obj.has_next %}
                             <li class="page-item">
                                 <a class="page-link"
@@ -95,3 +103,12 @@
     </div>
 </div> 
 {% endblock content %}
+{% block scripts %}
+    <script>
+        $(document).ready(function () {
+            $('.add-or-remove-favorite').click(function () {
+                add_or_remove_favorite($(this))
+            })
+        })
+    </script>
+{% endblock scripts %}

@@ -28,7 +28,7 @@
                 {% include 'parts/forms/add_to_cart.html' with item_id=product.items.id %}
 
                 <a href="{% url 'add_or_remove_favorite' product.items.id %}">
-                    {% if not product.items.is_favorite %}
+                    {% if product.items.is_favorite %}
                        <svg xmlns="http://www.w3.org/2000/svg"
                            width="16" height="16"
                            fill="currentColor"
@@ -49,7 +49,7 @@
                 </a>                
                 
             </br>
-                {% comment %} {% include 'parts/forms/add_to_favorites.html' with item_id=product.id %}  {% endcomment %}
+                
             </div>
             {% empty %}
             <h3>Your favorite is empty.</h3>
